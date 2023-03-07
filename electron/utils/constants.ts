@@ -1,0 +1,1 @@
+export const defaultHudSize = {x: 50, y: 50};
