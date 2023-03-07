@@ -40,7 +40,8 @@
   "build": {
     "extends": null,
     "win": {
-      "requestedExecutionLevel": "requireAdministrator"
+      "requestedExecutionLevel": "requireAdministrator",
+      "icon": "./build/favicon.ico"
     },
     "files": [
       "build/**/*"

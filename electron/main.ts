@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, screen} from 'electron';
+import { app, BrowserWindow, screen, Tray} from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-installer";
 import { defaultHudSize } from './utils/constants';
 
@@ -59,7 +59,7 @@ const createHud = () => {
   });
 
   if (app.isPackaged) {
-    win.loadURL(`file://${__dirname}/../index.html`);
+    win.loadURL(`file://${__dirname}/../index.html#/hud`);
   } else {
     let devtools = new BrowserWindow()
     win.webContents.setDevToolsWebContents(devtools.webContents)
@@ -72,12 +72,12 @@ const createHud = () => {
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 500,
-    height: 600,
+      width: 500,
+      height: 600,
   //  maxHeight: 600,
   //  maxWidth: 700,
-    autoHideMenuBar: false,
-    webPreferences: {
+      autoHideMenuBar: true,
+      webPreferences: {
       // contextIsolation: false,
       preload: path.join(__dirname, 'preload.js'),
     }
@@ -85,7 +85,7 @@ function createWindow() {
 
   if (app.isPackaged) {
     // 'build/index.html'
-    win.loadURL(`file://${__dirname}/../index.html`);
+    win.loadURL(`file://${__dirname}/../index.html#/landing`);
   } else {
     let devtools = new BrowserWindow()
     win.webContents.setDevToolsWebContents(devtools.webContents)
@@ -104,6 +104,10 @@ function createWindow() {
       hardResetMethod: 'exit'
     });
   }
+
+  win.on ('close', () => {
+    app.quit();
+  })
 
   return win;
 }

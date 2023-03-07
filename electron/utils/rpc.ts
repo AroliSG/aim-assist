@@ -5,8 +5,7 @@ const client    = new Client({ transport: 'ipc' });
 client.on('ready', () => {
     client.clearActivity ();
     client.setActivity ({
-        state: 'Developed by AroliSG',
-        details: 'Simple and Easy',
+        state: 'Societyg Software',
         startTimestamp: Date.now(),
         largeImageKey: "https://pngimg.com/uploads/aim/aim_PNG42.png",
         instance: false,

@@ -10,9 +10,12 @@ import { ImageTypes } from '../utils/types';
     last thing before publishing
 */
 
+const keys: string[] = [];
+
 const Landing = () => {
-  const [getKeybind, setKeybind]          = useState ({ key1:null,key2:null,key3:null });
+  const [getKeybind, setKeybind]          = useState ({ key1: 'unbind', key2: 'unbind', key3: 'unbind' });
   const [getKeyEnabled, setKeyEnabled]    = useState (false);
+
   const [getMoveHud, setMoveHud]          = useState ({x:0,y:0});
   const [getMoveSpeed, setMoveSpeed]      = useState (5);
 
@@ -29,24 +32,40 @@ const Landing = () => {
 
 
   useEffect (() => {
-      // scaling image
-    window.electron.invoke ("getScale", "").then ((scale) => {
-      setSizeRange(parseInt (scale,10));
-    });
+      // calling data such as coords, scale, images
+    window.electron.invoke ("getLandingData", "").then ((dt) => {
+      const sep       = dt.split('|');
 
-      // coords
-    window.electron.invoke ("getCoords", "").then ((coords) => {
-      setMoveHud(coords);
-    });
+      const coords    = JSON.parse(sep[0]);
+      const images    = JSON.parse(sep[2]);
+      const bind      = JSON.parse(sep[3]);
+      const scale     = parseInt(sep[1],10);
 
-      // image base64
-    window.electron.invoke ("getImages", "").then ((images) => {
-        // concat
-        // merging 2 arrays
-        // one if from the back-end which contains image base64 and the originals
-      const dt = getBase64Image.concat (images);
-      setBase64Image (dt);
+      const data      = getBase64Image.concat (images);
+
+      setKeybind (bind);
+      setMoveHud (coords);
+      setSizeRange (scale);
+      setBase64Image (data);
     });
+  }, []);
+
+  useEffect (() => {
+    const keydown = (evt: KeyboardEvent) => {
+      setKeybind (prev => {
+        if(prev.key1 === 'chose') prev.key1 = evt.key;
+        if(prev.key2 === 'chose') prev.key2 = evt.key;
+        if(prev.key3=== 'chose') prev.key3 = evt.key;
+
+        window.electron.send ("changeKeybind", prev.key1 + "|" + prev.key2 + '|' + prev.key3 );
+        return {...prev};
+      });
+    }
+
+    document.addEventListener ('keydown', keydown);
+    return () => {
+      document.removeEventListener('keydown', keydown);
+    };
   }, []);
 
   const ImageView = (props: ImageTypes) => {
@@ -59,7 +78,7 @@ const Landing = () => {
       <div
         className   = 'single_img_container_landing'
         style       = {{
-          backgroundColor: getItemClicked === index? 'var(--box)' : 'transparent',
+          backgroundColor: getItemClicked === index ? 'var(--box)' : 'transparent',
         }}
         onDoubleClick = {() => {
             // making sure only the base64 is being removed
@@ -89,6 +108,7 @@ const Landing = () => {
   const onImageUploaded = (evt: React.ChangeEvent<HTMLInputElement>) => {
     let img = new Image ();
     let url = window.URL;
+
     convertToBase64 (evt.target.files![0])
       .then ((base64) => {
         img.onload = () => {
@@ -135,6 +155,15 @@ const Landing = () => {
     })
   }
 
+  const changeKeybind = (key: 'key1' | 'key2' | 'key3', dt: string) => {
+    setKeybind (prev => {
+      return {
+        ...prev,
+        [key]: dt
+      }
+    });
+  }
+
   return (
     <div className = "landing_container">
       <div className='landing_container_image'>
@@ -144,7 +173,7 @@ const Landing = () => {
         <div className='comp_container'>
           <input className='file_input_landing' type={'file'} onChange = {onImageUploaded} accept="image/*"/>
           <p className = 'landing_title' style={{ marginTop: "5px" }}>Offset manager</p>
-          <div style={{display:'flex'}}>
+          <div style = {{display:'flex'}}>
             <div className='landing_arrow_box'>
               <i className='fa fa-arrow-up' onClick={() => moveIt ('y', -getMoveSpeed)}></i>
               <i className='fa fa-arrow-down' onClick={() => moveIt ('y', getMoveSpeed)}></i>
@@ -153,19 +182,21 @@ const Landing = () => {
               <i className='fa fa-arrow-right' onClick={() => moveIt ('x', getMoveSpeed)}></i>
             </div>
 
-            <div style={{marginInline: "5px"}}>
-              <p className = 'landing_title' style={{ marginTop: "5px" }}>Coordinates</p>
-              <p className = 'display_body' style={{ marginTop: "5px" }}> - Vertically: {getMoveHud.x}px</p>
-              <p className = 'display_body' style={{ marginTop: "5px" }}> - Horizontally: {getMoveHud.y}px</p>
+            <div style = {{marginInline: "5px"}}>
+              <p className = 'landing_title' style = {{ marginTop: "5px" }}>Coordinates</p>
+              <p className = 'display_body' style = {{ marginTop: "5px" }}> - Vertically: {getMoveHud.x}px</p>
+              <p className = 'display_body' style = {{ marginTop: "5px" }}> - Horizontally: {getMoveHud.y}px</p>
             </div>
           </div>
-          <div style={{
+          <div style = {{
             display: 'flex',
             justifyContent:'space-between'
           }}>
-            <button onClick={() => {
+            <button onClick = {() => {
+
                 // resetting pos too
               window.electron.send("moveIt", `0|0`);
+
                 // resetting hud inputs
               setMoveHud ({x:0,y:0});
             }}>Reset coords</button>
@@ -173,19 +204,17 @@ const Landing = () => {
           </div>
 
           <input
-              style={{
-                width:'100%'
-              }}
-              max       = {10}
-              min       = {1}
-              step      = {0.1}
-              type      = {'range'}
-              value     = {getMoveSpeed}
-              onChange  = {evt => {
-                const range = parseInt (evt.target.value, 10);
-                setMoveSpeed (range);
-              }}
-            />
+            style     = {{ width:'100%' }}
+            max       = {10}
+            min       = {1}
+            step      = {0.1}
+            type      = {'range'}
+            value     = {getMoveSpeed}
+            onChange  = {evt => {
+              const range = parseInt (evt.target.value, 10);
+              setMoveSpeed (range);
+            }}
+          />
         </div>
       </div>
 
@@ -232,9 +261,7 @@ const Landing = () => {
              marginInlineStart: '10px'
           }}>Hud Scale ({getSizeRange})</p>
           <input
-            style={{
-              width:'100%'
-            }}
+            style     = {{ width:'100%' }}
             max       = {5}
             min       = {1}
             step      = {0.1}
@@ -258,8 +285,7 @@ const Landing = () => {
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-          <p className='landing_title'>Hot Key - [Disabled]</p>
-          <input type={'checkbox'}/>
+          <p className='landing_title'>Hot Key - [{(getKeybind.key1 === 'unbind'||getKeybind.key2 === 'unbind'||getKeybind.key3 === 'unbind') ? 'Disabled' : 'Enabled'}]</p>
         </div>
         <div style={{
           display: 'flex',
@@ -267,11 +293,16 @@ const Landing = () => {
           alignItems: 'center',
           marginTop: '5px'
         }}>
-            <button>unbind</button>
-            <button>unbind</button>
-            <button>unbind</button>
+            <button onClick={() => changeKeybind ('key1', 'chose')}>{getKeybind.key1}</button>
+            <button onClick={() => changeKeybind ('key2', 'chose')}>{getKeybind.key2}</button>
+            <button onClick={() => changeKeybind ('key3', 'chose')}>{getKeybind.key3}</button>
         </div>
-        <button>RESET KEY BINDS</button>
+        <button
+          onClick ={() => {
+            setKeybind ({ key1:"unbind", key2:"unbind", key3:"unbind" });
+            window.electron.send ("changeKeybind", 'unbind|unbind|unbind' );
+          }}
+        >RESET KEY BINDS</button>
       </div>
     </div>
   );

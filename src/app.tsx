@@ -28,7 +28,7 @@ const App = () => {
                 <nav className="navbar">
                     <Link onClick={onClick} id = 'huds' className = "link menu" to={"landing"}>Huds</Link>
                     <Link onClick={onClick} id ='displays' className="link options" to={"display"}>Displays</Link>
-                    <Link onClick={onClick} id ='settings' className="link options" to={"credits"}>Credits</Link>
+                    <Link onClick={onClick} id ='credits' className="link options" to={"credits"}>Credits</Link>
                 </nav>
                 <div className="app_container">
                     <Outlet />

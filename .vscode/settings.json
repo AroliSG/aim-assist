@@ -3,6 +3,7 @@
         "bigify",
         "Huds",
         "hudscreen",
+        "Keybind",
         "spsa"
     ]
 }
