@@ -1,6 +1,11 @@
 # crosshair-assist
 crosshair assist consist on a program that helps you to improve your aiming in game. With a custom hud in the middle of your screen
 
+# Binaries
+ - Download and Install the binaries and use it! as much as you can for free! don't forget to star this repository if you <3 this project.
+
+
+
 
                                  Apache License
                            Version 2.0, January 2004
