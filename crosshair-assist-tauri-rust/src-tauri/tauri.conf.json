@@ -1,0 +1,105 @@
+{
+  "build": {
+    "beforeDevCommand": "yarn dev",
+    "beforeBuildCommand": "yarn build",
+    "devPath": "http://localhost:1420",
+    "distDir": "../dist",
+    "withGlobalTauri": false
+  },
+  "package": {
+    "productName": "Crosshair Assist",
+    "version": "0.0.1"
+  },
+  "tauri": {
+    "systemTray": {
+      "iconPath": "../public/assets/reticle-0.png",
+      "iconAsTemplate": true,
+      "menuOnLeftClick": true
+    },
+    "allowlist": {
+      "globalShortcut": {
+        "all": true
+      },
+      "app": {
+        "all": true,
+        "hide": true,
+        "show": true
+      },
+      "shell": {
+        "all": false,
+        "open": true
+      },
+      "window": {
+        "all": true,
+        "create": true,
+        "center": true,
+        "requestUserAttention": true,
+        "setResizable": true,
+        "setTitle": true,
+        "maximize": true,
+        "unmaximize": true,
+        "minimize": true,
+        "unminimize": true,
+        "show": true,
+        "hide": true,
+        "close": true,
+        "setDecorations": true,
+        "setAlwaysOnTop": true,
+        "setSize": true,
+        "setMinSize": true,
+        "setMaxSize": true,
+        "setPosition": true,
+        "setFullscreen": true,
+        "setFocus": true,
+        "setIcon": true,
+        "setSkipTaskbar": true,
+        "setCursorGrab": true,
+        "setCursorVisible": true,
+        "setCursorIcon": true,
+        "setCursorPosition": true,
+        "setIgnoreCursorEvents": true,
+        "startDragging": true,
+        "print": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "icon": [
+        "icons/icon.png",
+        "icons/icon.ico"
+      ],
+      "identifier": "crosshair-assist",
+      "copyright": "Societyg Software - AroliSG",
+      "targets": "all"
+    },
+    "security": {
+      "csp": null
+    },
+    "updater": {
+      "active": false
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "resizable": true,
+        "title": "Crosshair Assist",
+        "width": 500,
+        "height": 550,
+        "maximized": false,
+        "decorations": false
+      },
+      {
+        "label": "hud",
+        "title": "Hud",
+        "url": "/hud",
+        "fullscreen": false,
+        "resizable": false,
+        "width": 200,
+        "height": 200,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true
+      }
+    ]
+  }
+}
